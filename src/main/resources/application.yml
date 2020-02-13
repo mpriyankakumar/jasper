@@ -1,0 +1,27 @@
+server:
+  port: 8899
+
+storage:
+  location: uploads
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/jasper?useSSL=false
+    username: ${DB_USER:jasper}
+    password: ${DB_PASSWORD:jasper}
+    driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      ddl-auto: none
+    properties:
+      javax:
+        persistence:
+          validation:
+            mode: none
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+
+logging:
+  level:
+    com.temeos.jasperreport: DEBUG
+    org.springframework: DEBUG
