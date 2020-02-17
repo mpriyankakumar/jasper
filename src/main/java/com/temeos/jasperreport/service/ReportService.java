@@ -1,5 +1,7 @@
 package com.temeos.jasperreport.service;
 
+import com.temeos.jasperreport.model.ReportParam;
+import com.temeos.jasperreport.util.ReportUtil;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +11,6 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class ReportService {
@@ -25,37 +25,32 @@ public class ReportService {
     private DataSource dataSource;
 
 
-    public Resource generateReport(final String fileFormat) {
-        final JasperReport jasperReport = simpleReportFiller.compileReport("employeeEmailReport.jrxml", "employeeReport.jrxml");
+    public Resource generateReport(final ReportParam reportParam, final String fileFormat) {
+        final JasperReport jasperReport = simpleReportFiller.compileReport(reportParam.getMainReportName(), reportParam.getSubReportName());
 
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("title", "Employee Report Example");
-        parameters.put("minSalary", 15000.0);
-        parameters.put("condition", " LAST_NAME ='Smith' ORDER BY FIRST_NAME");
+        final JasperPrint jasperPrint = simpleReportFiller.fillReport(jasperReport, reportParam.getParameters(), dataSource);
 
-        final JasperPrint jasperPrint = simpleReportFiller.fillReport(jasperReport, parameters, dataSource);
-
-        ByteArrayOutputStream outputStream = null;
+        ByteArrayOutputStream outputStream;
         switch (fileFormat.toUpperCase()) {
             case "PDF":
-                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToPdf("employeeReport.pdf", "baeldung", jasperPrint);
+                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToPdf(jasperPrint);
                 break;
 
             case "XLSX":
-                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToXlsx("employeeReport.xlsx", "Employee Data", jasperPrint);
+                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToXlsx(ReportUtil.removeFileExtension(reportParam.getMainReportName()), jasperPrint);
                 break;
 
             case "CSV":
-                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToCsv("employeeReport.csv", jasperPrint);
+                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToCsv(jasperPrint);
                 break;
 
             case "HTML":
-                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToHtml("employeeReport.html", jasperPrint);
+                outputStream = (ByteArrayOutputStream) reportGeneratorServiceImpl.exportToHtml(jasperPrint);
                 break;
+            default:
+                throw new RuntimeException("Invalid file format.");
         }
-
         byte[] bytes = outputStream.toByteArray();
-        Resource resource = new ByteArrayResource(bytes);
-        return resource;
+        return (bytes.length != 0) ? new ByteArrayResource(bytes) : null;
     }
 }

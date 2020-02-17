@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 @Component
 public class ReportGeneratorServiceImpl {
 
-    public OutputStream exportToPdf(String fileName, String author, JasperPrint jasperPrint) {
+    public OutputStream exportToPdf(JasperPrint jasperPrint) {
 
         // print report to file
         JRPdfExporter exporter = new JRPdfExporter();
@@ -34,7 +34,7 @@ public class ReportGeneratorServiceImpl {
         reportConfig.setForceLineBreakPolicy(false);
 
         SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
-        exportConfig.setMetadataAuthor(author);
+        //exportConfig.setMetadataAuthor(author);
         exportConfig.setEncrypted(true);
         exportConfig.setAllowedPermissionsHint("PRINTING");
 
@@ -48,7 +48,7 @@ public class ReportGeneratorServiceImpl {
         return outputStream;
     }
 
-    public OutputStream exportToXlsx(String fileName, String sheetName, JasperPrint jasperPrint) {
+    public OutputStream exportToXlsx(String sheetName, JasperPrint jasperPrint) {
         JRXlsxExporter exporter = new JRXlsxExporter();
 
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
@@ -69,7 +69,7 @@ public class ReportGeneratorServiceImpl {
         return outputStream;
     }
 
-    public OutputStream exportToCsv(String fileName, JasperPrint jasperPrint) {
+    public OutputStream exportToCsv(JasperPrint jasperPrint) {
         JRCsvExporter exporter = new JRCsvExporter();
 
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
@@ -86,7 +86,7 @@ public class ReportGeneratorServiceImpl {
         return outputStream;
     }
 
-    public OutputStream exportToHtml(String fileName, JasperPrint jasperPrint) {
+    public OutputStream exportToHtml(JasperPrint jasperPrint) {
         HtmlExporter exporter = new HtmlExporter();
 
         exporter.setExporterInput(new SimpleExporterInput(jasperPrint));

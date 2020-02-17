@@ -14,7 +14,14 @@ import java.util.logging.Logger;
 @Component
 public class SimpleReportFiller {
 
-    public JasperReport compileReport(final String... reportFileName) {
+    public JasperReport compileReport(final String mainReportFileName, final String... subReportFileName) {
+        if (subReportFileName.length != 0) {
+            compile(subReportFileName);
+        }
+        return compile(mainReportFileName);
+    }
+
+    private JasperReport compile(final String... reportFileName) {
         JasperReport jasperReport = null;
         for (final String fileName : reportFileName) {
             try {
