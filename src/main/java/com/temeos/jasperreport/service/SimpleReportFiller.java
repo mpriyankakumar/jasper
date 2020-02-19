@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Level;
@@ -36,10 +37,19 @@ public class SimpleReportFiller {
     }
 
     public JasperPrint fillReport(final JasperReport jasperReport, final Map<String, Object> parameters, final DataSource dataSource) {
+        Connection connection = null;
         try {
-            return JasperFillManager.fillReport(jasperReport, parameters, dataSource.getConnection());
+            connection = dataSource.getConnection();
+            return JasperFillManager.fillReport(jasperReport, parameters, connection);
         } catch (JRException | SQLException ex) {
             Logger.getLogger(SimpleReportFiller.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException ex) {
+            }
         }
         return null;
     }
