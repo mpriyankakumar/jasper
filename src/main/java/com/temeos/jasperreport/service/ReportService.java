@@ -26,7 +26,7 @@ public class ReportService {
 
 
     public Resource generateReport(final ReportParam reportParam, final String fileFormat) {
-        final JasperReport jasperReport = simpleReportFiller.compileReport(reportParam.getMainReportName(), reportParam.getSubReportName());
+        final JasperReport jasperReport = simpleReportFiller.compileReport(reportParam.getMainReportName(), reportParam.getReportFilePath(), reportParam.getSubReportName());
 
         final JasperPrint jasperPrint = simpleReportFiller.fillReport(jasperReport, reportParam.getParameters(), dataSource);
 
